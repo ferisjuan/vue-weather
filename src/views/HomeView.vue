@@ -12,14 +12,17 @@
         class="absolute bg-weather-secondary text-white w-full shadow-md py-2 px-1 top-[67px]"
         v-if="mapboxSearchResults"
       >
-        <p class="py-2" v-if="searchError">Sorry, something went wrong, please try agan</p>
+        <p class="py-2" v-if="searchError">
+          Sorry, something went wrong, please try agan
+        </p>
         <p class="py-2" v-if="!searchError && mapboxSearchResults.lenght === 0">
           No results match your query, try a different term.
         </p>
         <template v-else>
           <li
-            v-for="searchResult in mapboxSearchResults"
+            @click="previewCity(searchResult)"
             :key="searchResult.id"
+            v-for="searchResult in mapboxSearchResults"
             class="py-2 cursor-pointer"
           >
             {{ searchResult.place_name }}
@@ -33,6 +36,7 @@
 <script setup>
 import axios from "axios";
 import {ref} from "vue";
+import {useRouter} from "vue-router";
 
 const searchQuery = ref("");
 const searchError = ref(null);
@@ -57,5 +61,22 @@ const getSearchResults = () => {
       searchError.value = true;
     }
   }, 300);
+};
+
+const router = useRouter();
+const previewCity = (searchResult) => {
+  console.log(searchResult);
+  const [city, state] = searchResult.place_name.split(",");
+  const [lon, lat] = searchResult.geometry.coordinates;
+
+  router.push({
+    name: "cityView",
+    params: {state: state.replaceAll(" ", ""), city},
+    query: {
+      lat,
+      lon,
+      preview: true,
+    },
+  });
 };
 </script>
