@@ -1,8 +1,8 @@
 <template>
-  <main class="flex flex-col min-h-screen font-Roboto bg-weather-primary">
+  <section class="flex flex-col min-h-screen font-Roboto bg-weather-primary">
     <SiteNavigation />
     <RouterView />
-  </main>
+  </section>
 </template>
 
 <script setup>
