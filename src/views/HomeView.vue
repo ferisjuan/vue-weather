@@ -12,13 +12,19 @@
         class="absolute bg-weather-secondary text-white w-full shadow-md py-2 px-1 top-[67px]"
         v-if="mapboxSearchResults"
       >
-        <li
-          v-for="searchResult in mapboxSearchResults"
-          :key="searchResult.id"
-          class="py-2 cursor-pointer"
-        >
-          {{ searchResult.place_name }}
-        </li>
+        <p class="py-2" v-if="searchError">Sorry, something went wrong, please try agan</p>
+        <p class="py-2" v-if="!searchError && mapboxSearchResults.lenght === 0">
+          No results match your query, try a different term.
+        </p>
+        <template v-else>
+          <li
+            v-for="searchResult in mapboxSearchResults"
+            :key="searchResult.id"
+            class="py-2 cursor-pointer"
+          >
+            {{ searchResult.place_name }}
+          </li>
+        </template>
       </ul>
     </div>
   </main>
@@ -29,6 +35,7 @@ import axios from "axios";
 import {ref} from "vue";
 
 const searchQuery = ref("");
+const searchError = ref(null);
 const queryTimeout = ref(null);
 const mapboxSearchResults = ref(null);
 
@@ -38,14 +45,17 @@ const getSearchResults = () => {
   queryTimeout.value = setTimeout(async () => {
     if (searchQuery.value === "") mapboxSearchResults.value = null;
 
-    const endpoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${
-      searchQuery.value
-    }.json?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}&types=place`;
+    try {
+      const endpoint = `https://api.mapbox.com/geocoding/v5/mapbox.places/${
+        searchQuery.value
+      }.json?access_token=${import.meta.env.VITE_MAPBOX_TOKEN}&types=place`;
 
-    const result = await axios.get(endpoint);
+      const result = await axios.get(endpoint);
 
-    console.log(mapboxSearchResults.value);
-    mapboxSearchResults.value = result.data.features;
+      mapboxSearchResults.value = result.data.features;
+    } catch {
+      searchError.value = true;
+    }
   }, 300);
 };
 </script>
