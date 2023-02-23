@@ -63,6 +63,8 @@ const getWeatherData = async () => {
 
     weatherData.data.currentTime = utc + 1000 * weatherData.data.timezone;
 
+    await new Promise(res => setTimeout(res, 500))
+
     return weatherData.data;
   } catch (error) {
     console.log(error);
@@ -74,7 +76,6 @@ const weatherData = await getWeatherData();
 const router = useRouter();
 const removeCity = () => {
   const cities = JSON.parse(localStorage.getItem("savedCities"));
-  console.log('🚀 ~ removeCity ~ cities:', cities);
 
   const updatedCities = cities.filter(city => city.id !== query.id);
 
